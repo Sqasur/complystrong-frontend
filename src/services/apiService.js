@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { MOCK_CERTIFICATIONS, MOCK_QUESTIONS, MOCK_ASSESSMENT_RESULT } from '../mocks/mockData';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 /**
  * API service to handle all network requests.
