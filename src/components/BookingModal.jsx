@@ -11,6 +11,7 @@ const BookingModal = ({ isOpen, onClose }) => {
         time: '',
         type: 'General Assessment',
         name: '',
+        company: '',
         email: '',
         phone: ''
     });
@@ -155,7 +156,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div>
                                 <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
-                                    Full Name
+                                    Full Name <span className="text-red-500 ml-1">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -170,7 +171,22 @@ const BookingModal = ({ isOpen, onClose }) => {
 
                             <div>
                                 <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
-                                    Work Email
+                                    Company Name <span className="text-red-500 ml-1">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="company"
+                                    required
+                                    value={formData.company}
+                                    onChange={handleChange}
+                                    placeholder="Acme Corp"
+                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
+                                    Work Email <span className="text-red-500 ml-1">*</span>
                                 </label>
                                 <input
                                     type="email"
@@ -185,7 +201,7 @@ const BookingModal = ({ isOpen, onClose }) => {
 
                             <div>
                                 <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
-                                    Phone Number
+                                    Phone Number <span className="text-red-500 ml-1">*</span>
                                 </label>
                                 <input
                                     type="tel"
@@ -208,7 +224,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={!formData.name || !formData.email || !formData.phone || sending}
+                                    disabled={sending}
                                     className="flex-1 bg-indigo-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
                                 >
                                     {sending ? (

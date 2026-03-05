@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -8,7 +8,29 @@ const statusConfig = {
     rejected: { label: 'Rejected', bg: 'bg-rose-100/50', text: 'text-rose-700', border: 'border-rose-200/50', dot: 'bg-rose-500' },
 };
 
+const playNotificationSound = () => {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
 
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
+
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + 0.5);
+    } catch (e) {
+        console.error("Audio play failed", e);
+    }
+};
 
 const AdminDashboard = () => {
     const [authed, setAuthed] = useState(() => localStorage.getItem('adminAuthed') === 'true');
@@ -19,6 +41,7 @@ const AdminDashboard = () => {
     const [bookings, setBookings] = useState([]);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [updatingId, setUpdatingId] = useState(null);
     const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
@@ -34,6 +57,7 @@ const AdminDashboard = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [editForm, setEditForm] = useState({ id: '', name: '', username: '', password: '', role: 'manager', phone: '' });
     const [userToDelete, setUserToDelete] = useState(null);
+    const prevPendingCountRef = useRef(null);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -58,8 +82,8 @@ const AdminDashboard = () => {
         }
     };
 
-    const fetchBookings = async () => {
-        setLoading(true);
+    const fetchBookings = async (showLoader = true) => {
+        if (showLoader) setLoading(true);
         try {
             const res = await fetch(`${API_BASE}/bookings`, {
                 headers: { 'x-user-role': user.role }
@@ -69,7 +93,7 @@ const AdminDashboard = () => {
         } catch {
             setBookings([]);
         }
-        setLoading(false);
+        if (showLoader) setLoading(false);
     };
 
 
@@ -90,6 +114,13 @@ const AdminDashboard = () => {
         if (authed) {
             fetchBookings();
             if (user.role === 'admin') fetchUsers();
+
+            const intervalId = setInterval(() => {
+                // Background polling to catch new bookings so notification sounds can play 
+                fetchBookings(false);
+            }, 10000);
+
+            return () => clearInterval(intervalId);
         }
     }, [authed, user.role]);
 
@@ -183,6 +214,13 @@ const AdminDashboard = () => {
         accepted: bookings.filter(b => b.status === 'accepted').length,
         rejected: bookings.filter(b => b.status === 'rejected').length,
     };
+
+    useEffect(() => {
+        if (prevPendingCountRef.current !== null && counts.pending > prevPendingCountRef.current) {
+            playNotificationSound();
+        }
+        prevPendingCountRef.current = counts.pending;
+    }, [counts.pending]);
 
     if (!authed) {
         return (
@@ -281,7 +319,7 @@ const AdminDashboard = () => {
 
                 <nav className="flex-1 px-4 space-y-2">
                     {[
-                        { id: 'bookings', label: 'Bookings', icon: <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /> },
+                        { id: 'bookings', label: 'Bookings', icon: <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />, badge: counts.pending },
                         { id: 'analytics', label: 'Analytics', icon: <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /> },
                         { id: 'users', label: 'Manage Users', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /> },
                         { id: 'settings', label: 'Settings', icon: <><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></>, disabled: true },
@@ -362,14 +400,37 @@ const AdminDashboard = () => {
                             />
                         </div>
 
+                        {/* Notification Bell */}
                         <button
                             onClick={() => {
-                                if (activeTab === 'bookings') fetchBookings();
-                                else if (activeTab === 'users') fetchUsers();
+                                setActiveTab('bookings');
+                                setFilter('pending');
                             }}
-                            className="w-12 h-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm group active:scale-95"
+                            className="relative w-12 h-12 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group"
+                            title="Pending Bookings"
                         >
-                            <svg className="w-5 h-5 group-hover:rotate-180 transition-transform duration-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className={`w-7 h-7 ${counts.pending > 0 ? 'text-[#0ea5e9] animate-[wiggle_1s_ease-in-out_infinite]' : 'text-slate-300'} transition-all`} viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                            </svg>
+                            {counts.pending > 0 && (
+                                <span className="absolute top-1 right-1 w-[22px] h-[22px] bg-[#df2626] border-2 border-white rounded-full flex items-center justify-center text-[12px] font-black text-white shadow-sm leading-none" style={{ transform: 'translate(25%, -25%)' }}>
+                                    {counts.pending}
+                                </span>
+                            )}
+                        </button>
+
+                        <button
+                            onClick={async () => {
+                                setIsRefreshing(true);
+                                if (activeTab === 'bookings') await fetchBookings(false);
+                                else if (activeTab === 'users') await fetchUsers();
+                                setIsRefreshing(false);
+                            }}
+                            disabled={isRefreshing}
+                            className={`w-10 h-10 flex items-center justify-center text-[#0ea5e9] transition-all group ${isRefreshing ? 'opacity-80' : 'hover:scale-105 active:scale-95'}`}
+                            title="Refresh"
+                        >
+                            <svg className={`w-6 h-6 ${isRefreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-700'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
                         </button>

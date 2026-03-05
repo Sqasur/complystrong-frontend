@@ -102,7 +102,7 @@ const Wizard = () => {
                 <div className="max-w-2xl mx-auto px-6">
                     <div className="mb-4">
                         <div className="flex items-center justify-between mb-3 text-xs">
-                            <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-700 text-white text-[11px] sm:text-xs font-bold rounded-[24px] uppercase tracking-widest leading-none flex items-center shadow-md shadow-emerald-100/50">
+                            <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white text-[11px] sm:text-xs font-bold rounded-[24px] uppercase tracking-widest leading-none flex items-center shadow-md shadow-indigo-100/50">
                                 {questions[currentIndex]?.category || 'Documentation'}
                             </span>
                             <span className="font-bold text-slate-500">{`${Math.round(progress)}% Complete`}</span>
