@@ -24,7 +24,7 @@ const BookingModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         setSending(true);
         setError('');
         try {
@@ -39,7 +39,13 @@ const BookingModal = ({ isOpen, onClose }) => {
             }
             setStep(3); // Success step
         } catch (err) {
-            setError(err.message || 'Something went wrong. Please try again.');
+            const msg = err.message || 'Something went wrong. Please try again.';
+            // Simplify the technical error message for users
+            if (msg.includes('buffering timed out') || msg.includes('unavailable') || msg.includes('ECONNREFUSED')) {
+                setError('Connection issue. Please wait a moment and try again.');
+            } else {
+                setError(msg);
+            }
         } finally {
             setSending(false);
         }
@@ -214,7 +220,17 @@ const BookingModal = ({ isOpen, onClose }) => {
                                 </button>
                             </div>
                             {error && (
-                                <p className="text-rose-600 text-sm font-medium text-center mt-2">{error}</p>
+                                <div className="mt-3 p-3 bg-rose-50 border border-rose-100 rounded-xl text-center">
+                                    <p className="text-rose-600 text-sm font-medium mb-2">{error}</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleSubmit(null)}
+                                        disabled={sending}
+                                        className="text-xs font-black text-rose-600 uppercase tracking-widest hover:text-rose-800 border border-rose-200 px-4 py-1.5 rounded-lg hover:bg-rose-50 transition-all"
+                                    >
+                                        {sending ? 'Retrying...' : '↻ Retry'}
+                                    </button>
+                                </div>
                             )}
                         </form>
                     )}
