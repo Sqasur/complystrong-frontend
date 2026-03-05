@@ -72,7 +72,7 @@ const Home = () => {
                     <div className="mb-8 sm:mb-10 flex flex-col items-center">
                         <div className="w-28 sm:w-32 h-14 sm:h-16 flex items-center justify-center mb-6 sm:mb-8 transition-transform hover:scale-105 duration-500">
                             <img
-                                src="https://complystrong.com/wp-content/uploads/2025/12/logo_compliance_program.webp"
+                                src="https://complystrong.com/wp-content/uploads/2025/12/logo_compliance_program.png"
                                 alt="Radinas Logo"
                                 className="w-full h-full object-contain"
                             />
@@ -101,7 +101,7 @@ const Home = () => {
                     <div className="group cursor-pointer" onClick={() => window.location.assign('https://complystrong.com/')}>
                         <div className="w-24 sm:w-28 h-10 sm:h-12 flex items-center justify-start transition-transform duration-500 overflow-hidden hover:scale-105">
                             <img
-                                src="https://complystrong.com/wp-content/uploads/2025/12/logo_compliance_program.webp"
+                                src="https://complystrong.com/wp-content/uploads/2025/12/logo_compliance_program.png"
                                 alt="Radinas Logo"
                                 className="w-full h-full object-contain"
                             />
