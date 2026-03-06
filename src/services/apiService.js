@@ -6,7 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 /**
  * Computes assessment results entirely client-side from answers and questions.
  */
-function computeLocalResult(certificationId, answers, questions) {
+function computeLocalResult(certificationId, answers, questions, contactInfo) {
     const certification = MOCK_CERTIFICATIONS.find(c => c._id === certificationId) || { _id: certificationId, name: 'Unknown' };
     const questionMap = new Map(questions.map(q => [q._id, q]));
 
@@ -55,6 +55,7 @@ function computeLocalResult(certificationId, answers, questions) {
         score,
         tier,
         gaps: topGaps,
+        contactInfo,
         createdAt: new Date().toISOString(),
     };
 }
@@ -100,18 +101,19 @@ const apiService = {
         }
     },
 
-    async submitAssessment(certificationId, answers) {
+    async submitAssessment(certificationId, answers, contactInfo) {
         try {
             const response = await axios.post(`${API_BASE_URL}/assessments`, {
                 certificationId,
                 answers,
+                contactInfo,
             });
             return response.data;
         } catch (error) {
             console.warn('API submitAssessment failed, computing result locally.', error);
             // Compute real result from actual answers client-side
             const questions = getLocalQuestions(certificationId);
-            const result = computeLocalResult(certificationId, answers, questions);
+            const result = computeLocalResult(certificationId, answers, questions, contactInfo);
             // Store in sessionStorage so Results page can read it
             sessionStorage.setItem('localResult', JSON.stringify(result));
             return result;

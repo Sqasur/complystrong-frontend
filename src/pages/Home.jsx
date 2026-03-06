@@ -127,9 +127,13 @@ const Home = () => {
             <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 relative">
                 <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     <div className="text-center lg:text-left">
-                        <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#4f46e5] to-indigo-700 rounded-full mb-6 shadow-sm shadow-indigo-100">
-                            <span className="flex h-1.5 w-1.5 rounded-full bg-white mr-3 animate-pulse"></span>
-                            <span className="text-[10px] font-black text-white uppercase tracking-widest italic">3-Minute Assessment</span>
+                        <div className="flex flex-col items-center lg:items-start mb-6">
+                            <div className="inline-flex items-center px-4 py-2 sm:px-5 sm:py-2.5 bg-[#0066cc] rounded-full shadow-sm shadow-[#0066cc]/30">
+                                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                                </svg>
+                                <span className="text-[11px] sm:text-sm font-black text-white uppercase tracking-widest whitespace-nowrap">Free 3-Minute Audit Assessment</span>
+                            </div>
                         </div>
                         <div className="mb-6 flex flex-col items-center lg:items-start">
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight lg:leading-none">
@@ -201,7 +205,7 @@ const Home = () => {
                             <button
                                 type="submit"
                                 disabled={!selectedCert || !timeline}
-                                className="w-full bg-emerald-600 text-white rounded-2xl py-5 font-black text-lg uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-[#0066cc] text-white rounded-2xl py-5 font-black text-lg uppercase tracking-widest shadow-lg shadow-[#0066cc]/30 hover:bg-[#0052a3] hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Start Assessment
                             </button>
@@ -210,7 +214,7 @@ const Home = () => {
                 </div>
 
                 <footer className="mt-12 text-slate-400 text-sm font-medium">
-                    © 2026 Audit Radinas. Professional Grade Compliance Tools.
+                    © 2026 Audit Radinas. Professional Grade Compliance Tools. | Powered by Comply Strong
                 </footer>
             </div>
 

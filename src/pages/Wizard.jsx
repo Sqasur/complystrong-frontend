@@ -16,6 +16,8 @@ const Wizard = () => {
     const [answers, setAnswers] = useState({});
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [showLeadForm, setShowLeadForm] = useState(false);
+    const [leadData, setLeadData] = useState({ name: '', company: '', email: '', phone: '' });
 
     useEffect(() => {
         if (!certId) {
@@ -49,14 +51,20 @@ const Wizard = () => {
         }
     };
 
-    const handleSubmit = async () => {
+    const handleOpenLeadForm = () => {
+        setShowLeadForm(true);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Prevent form submission reload
         setSubmitting(true);
         try {
-            const result = await apiService.submitAssessment(certId, Object.values(answers));
+            const result = await apiService.submitAssessment(certId, Object.values(answers), leadData);
             navigate(`/results?id=${result._id}`);
         } catch (error) {
             console.error('Submission failed', error);
             setSubmitting(false);
+            // Optionally could add a user-visible error here
         }
     };
 
@@ -121,24 +129,23 @@ const Wizard = () => {
                         <button
                             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
                             disabled={currentIndex === 0}
-                            className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-gray-900 transition-colors disabled:opacity-0"
+                            className="px-6 py-3 rounded-xl font-bold text-black hover:text-gray-700 transition-colors disabled:opacity-0"
                         >
                             Previous
                         </button>
 
                         {isLastQuestion && hasAnsweredCurrent ? (
                             <button
-                                onClick={handleSubmit}
-                                disabled={submitting}
+                                onClick={handleOpenLeadForm}
                                 className="flex-1 bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all text-center"
                             >
-                                {submitting ? 'Calculating...' : 'Finish & See Results'}
+                                Finish & See Results
                             </button>
                         ) : (
                             <button
                                 onClick={() => setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1))}
                                 disabled={!hasAnsweredCurrent || isLastQuestion}
-                                className="px-6 py-3 rounded-xl font-bold text-emerald-600 hover:bg-emerald-50 transition-all disabled:opacity-0"
+                                className="px-6 py-3 rounded-xl font-bold text-black hover:bg-slate-50 transition-all disabled:opacity-0"
                             >
                                 Next
                             </button>
@@ -146,6 +153,111 @@ const Wizard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Lead Capture Modal */}
+            {showLeadForm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !submitting && setShowLeadForm(false)}></div>
+                    <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl p-8 sm:p-10 animate-fade-in-up border border-slate-100">
+                        {/* Close button */}
+                        {!submitting && (
+                            <button
+                                onClick={() => setShowLeadForm(false)}
+                                className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
+
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-600">
+                                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-800">Almost There!</h3>
+                            <p className="text-slate-500 mt-2 text-sm font-medium">Please enter your details to view your personalized assessment results.</p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                    Full Name <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={leadData.name}
+                                    onChange={(e) => setLeadData({ ...leadData, name: e.target.value })}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm"
+                                    placeholder="John Doe"
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                    Company Name <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={leadData.company}
+                                    onChange={(e) => setLeadData({ ...leadData, company: e.target.value })}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm"
+                                    placeholder="Acme Corp"
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                    Work Email <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={leadData.email}
+                                    onChange={(e) => setLeadData({ ...leadData, email: e.target.value })}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm"
+                                    placeholder="john@example.com"
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                    Phone Number <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="tel"
+                                    required
+                                    value={leadData.phone}
+                                    onChange={(e) => setLeadData({ ...leadData, phone: e.target.value })}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm"
+                                    placeholder="+1 (555) 000-0000"
+                                    disabled={submitting}
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={submitting}
+                                className="w-full bg-emerald-600 text-white rounded-xl py-3.5 font-bold uppercase tracking-widest mt-6 hover:bg-emerald-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-emerald-600/20"
+                            >
+                                {submitting ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Saving...
+                                    </span>
+                                ) : 'View My Results'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
