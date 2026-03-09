@@ -17,10 +17,7 @@ const Wizard = () => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [showLeadForm, setShowLeadForm] = useState(false);
-    const [leadData, setLeadData] = useState(() => {
-        const saved = localStorage.getItem('leadData');
-        return saved ? JSON.parse(saved) : { name: '', company: '', email: '', phone: '' };
-    });
+    const [leadData, setLeadData] = useState({ name: '', company: '', email: '', phone: '' });
     const [hasConsented, setHasConsented] = useState(!!localStorage.getItem('cookieConsent'));
 
     useEffect(() => {
