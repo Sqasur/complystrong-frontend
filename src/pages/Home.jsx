@@ -76,7 +76,7 @@ const Home = () => {
 
                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">Verification Required</h1>
                     <p className="text-slate-400 text-sm mb-8 max-w-[280px]">
-                        Please confirm you are human to access the Radinas Compliance Portal.
+                        Please confirm you are human to access the Readiness Compliance Portal.
                     </p>
 
                     {/* reCAPTCHA widget */}
@@ -98,7 +98,7 @@ const Home = () => {
                         <div className="w-24 sm:w-28 h-10 sm:h-12 flex items-center justify-start transition-transform duration-500 overflow-hidden hover:scale-105">
                             <img
                                 src="https://complystrong.com/wp-content/uploads/2025/12/logo_compliance_program.png"
-                                alt="Radinas Logo"
+                                alt="Readiness Logo"
                                 className="w-full h-full object-contain"
                             />
                         </div>
@@ -241,7 +241,7 @@ const Home = () => {
                 </div>
 
                 <footer className="mt-12 text-slate-400 text-sm font-medium">
-                    © 2026 Audit Radinas. Professional Grade Compliance Tools. | Powered by Comply Strong
+                    © 2026 Audit Readiness. Professional Grade Compliance Tools. | Powered by Comply Strong
                 </footer>
             </div>
 

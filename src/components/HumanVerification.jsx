@@ -106,7 +106,7 @@ const HumanVerification = ({ onVerified }) => {
                         fontFamily: 'Roboto, Arial, sans-serif',
                     }}
                 >
-                    Radinas Core
+                    Readiness Core
                 </span>
             </div>
 

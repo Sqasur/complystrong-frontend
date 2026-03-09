@@ -419,7 +419,7 @@ const AdminDashboard = () => {
                             </svg>
                         </div>
                         <div className="text-left">
-                            <span className="text-xl font-black text-slate-900 tracking-tight block leading-none">Radinas</span>
+                            <span className="text-xl font-black text-slate-900 tracking-tight block leading-none">Readiness</span>
                             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 block">Admin v2.0</span>
                         </div>
                     </div>
