@@ -6,14 +6,19 @@ const BookingModal = ({ isOpen, onClose }) => {
     const [step, setStep] = useState(1);
     const [sending, setSending] = useState(false);
     const [error, setError] = useState('');
-    const [formData, setFormData] = useState({
-        date: '',
-        time: '',
-        type: 'General Assessment',
-        name: '',
-        company: '',
-        email: '',
-        phone: ''
+    const [formData, setFormData] = useState(() => {
+        const savedLead = localStorage.getItem('leadData');
+        const lead = savedLead ? JSON.parse(savedLead) : {};
+
+        return {
+            date: '',
+            time: '',
+            type: 'General Assessment',
+            name: lead.name || '',
+            company: lead.company || '',
+            email: lead.email || '',
+            phone: lead.phone || ''
+        };
     });
 
     const availableTimeSlots = [

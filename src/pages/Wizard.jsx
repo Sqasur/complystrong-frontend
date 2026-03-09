@@ -17,7 +17,10 @@ const Wizard = () => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [showLeadForm, setShowLeadForm] = useState(false);
-    const [leadData, setLeadData] = useState({ name: '', company: '', email: '', phone: '' });
+    const [leadData, setLeadData] = useState(() => {
+        const saved = localStorage.getItem('leadData');
+        return saved ? JSON.parse(saved) : { name: '', company: '', email: '', phone: '' };
+    });
     const [hasConsented, setHasConsented] = useState(!!localStorage.getItem('cookieConsent'));
 
     useEffect(() => {
@@ -66,12 +69,14 @@ const Wizard = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
+            // Save lead data to localStorage for auto-fill in booking
+            localStorage.setItem('leadData', JSON.stringify(leadData));
+
             const result = await apiService.submitAssessment(certId, Object.values(answers), leadData);
             navigate(`/results?id=${result._id}`);
         } catch (error) {
             console.error('Submission failed', error);
             setSubmitting(false);
-
         }
     };
 

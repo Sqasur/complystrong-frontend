@@ -3,9 +3,9 @@ import React, { useState, useEffect, useRef } from 'react';
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 const statusConfig = {
-    pending: { label: 'Pending', bg: 'bg-amber-100/50', text: 'text-amber-700', border: 'border-amber-200/50', dot: 'bg-amber-500' },
+    pending: { label: 'Pending', bg: 'bg-gradient-to-r from-[#b45309] to-[#f59e0b]', text: 'text-white shadow-sm', border: 'border-[#b45309]', dot: 'bg-white' },
     accepted: { label: 'Accepted', bg: 'bg-gradient-to-r from-[#04785c] to-emerald-600', text: 'text-white shadow-sm', border: 'border-[#04785c]', dot: 'bg-white' },
-    rejected: { label: 'Rejected', bg: 'bg-rose-100/50', text: 'text-rose-700', border: 'border-rose-200/50', dot: 'bg-rose-500' },
+    rejected: { label: 'Rejected', bg: 'bg-gradient-to-r from-[#c0392b] to-[#e74c3c]', text: 'text-white shadow-sm', border: 'border-[#c0392b]', dot: 'bg-white' },
 };
 
 const playNotificationSound = () => {
@@ -618,19 +618,20 @@ const AdminDashboard = () => {
                                                                 {editingId === b._id ? (
                                                                     <div className="flex flex-col gap-2">
                                                                         <input
-                                                                            type="text"
+                                                                            type="date"
                                                                             value={editDate}
                                                                             onChange={(e) => setEditDate(e.target.value)}
                                                                             className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold outline-none focus:border-emerald-400"
-                                                                            placeholder="Date (e.g. March 15)"
                                                                         />
-                                                                        <input
-                                                                            type="text"
+                                                                        <select
                                                                             value={editTime}
                                                                             onChange={(e) => setEditTime(e.target.value)}
-                                                                            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold outline-none focus:border-emerald-400"
-                                                                            placeholder="Time (e.g. 10:00 AM)"
-                                                                        />
+                                                                            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold outline-none focus:border-emerald-400 appearance-none cursor-pointer"
+                                                                        >
+                                                                            {["09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM"].map(t => (
+                                                                                <option key={t} value={t}>{t}</option>
+                                                                            ))}
+                                                                        </select>
                                                                     </div>
                                                                 ) : (
                                                                     <div className="flex flex-col gap-1">
@@ -646,7 +647,7 @@ const AdminDashboard = () => {
                                                                 )}
                                                             </td>
                                                             <td className="px-10 py-6">
-                                                                <span className="inline-flex items-center px-4 py-2 bg-[#fff7ed] text-[#ea580c] rounded-xl text-[10px] font-black uppercase tracking-widest border border-[#ffedd5]">
+                                                                <span className="inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white" style={{ background: 'linear-gradient(135deg, #ff8c00 0%, #ff6200 50%, #e63900 100%)' }}>
                                                                     {b.type}
                                                                 </span>
                                                             </td>
