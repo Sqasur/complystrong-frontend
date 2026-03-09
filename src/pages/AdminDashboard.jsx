@@ -1213,7 +1213,7 @@ const AdminDashboard = () => {
                                                                         <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black text-white ${item.tier === 'Green' ? 'bg-emerald-500' :
                                                                             item.tier === 'Amber' ? 'bg-amber-500' : 'bg-rose-500'
                                                                             }`}>
-                                                                            {item.score}% {item.tier}
+                                                                            {item.score}%
                                                                         </span>
                                                                     </div>
                                                                 </td>
