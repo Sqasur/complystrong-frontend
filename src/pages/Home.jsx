@@ -70,30 +70,19 @@ const Home = () => {
 
     if (!isHuman) {
         return (
-            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
-                <div className="absolute top-0 -left-4 w-64 sm:w-96 h-64 sm:h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-5 animate-blob"></div>
-                <div className="absolute top-0 -right-4 w-64 sm:w-96 h-64 sm:h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-5 animate-blob animation-delay-2000"></div>
-                <div className="absolute -bottom-8 left-20 w-64 sm:w-96 h-64 sm:h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-5 animate-blob animation-delay-4000"></div>
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
+                <div className="flex flex-col items-center text-center">
 
-                <div className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-white/20 rounded-[2rem] sm:rounded-[3rem] shadow-2xl p-8 sm:p-12 text-center relative z-10 transition-all">
-                    <div className="mb-8 sm:mb-10 flex flex-col items-center">
-                        <div className="w-28 sm:w-32 h-14 sm:h-16 flex items-center justify-center mb-6 sm:mb-8 transition-transform hover:scale-105 duration-500">
-                            <img
-                                src="https://complystrong.com/wp-content/uploads/2025/12/logo_compliance_program.png"
-                                alt="Radinas Logo"
-                                className="w-full h-full object-contain"
-                            />
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-3">Verification Required</h1>
-                        <p className="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed mb-8 sm:mb-10 max-w-[280px]">Please confirm you are human to access the Radinas Compliance Portal.</p>
 
-                        <HumanVerification onVerified={() => setIsHuman(true)} />
-                    </div>
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">Verification Required</h1>
+                    <p className="text-slate-400 text-sm mb-8 max-w-[280px]">
+                        Please confirm you are human to access the Radinas Compliance Portal.
+                    </p>
 
-                    <div className="pt-6 sm:pt-8 border-t border-slate-50 flex flex-col items-center gap-1">
-                        <span className="text-[8px] sm:text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Radinas Intelligent Shielding</span>
-                        <span className="text-[7px] sm:text-[8px] text-slate-400 font-bold uppercase tracking-[0.3em]">Hardware ID: {Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
-                    </div>
+                    {/* reCAPTCHA widget */}
+                    <HumanVerification onVerified={() => setIsHuman(true)} />
+
+
                 </div>
             </div>
         );

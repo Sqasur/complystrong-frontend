@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 const statusConfig = {
-    pending: { label: 'Pending', bg: 'bg-gradient-to-r from-[#b45309] to-[#f59e0b]', text: 'text-white shadow-sm', border: 'border-[#b45309]', dot: 'bg-white' },
+    pending: { label: 'Pending', bg: 'bg-gradient-to-r from-[#d97706] to-[#fbbf24]', text: 'text-white shadow-sm', border: 'border-[#d97706]', dot: 'bg-white' },
     accepted: { label: 'Accepted', bg: 'bg-gradient-to-r from-[#04785c] to-emerald-600', text: 'text-white shadow-sm', border: 'border-[#04785c]', dot: 'bg-white' },
     rejected: { label: 'Rejected', bg: 'bg-gradient-to-r from-[#c0392b] to-[#e74c3c]', text: 'text-white shadow-sm', border: 'border-[#c0392b]', dot: 'bg-white' },
 };
@@ -36,6 +36,7 @@ const AdminDashboard = () => {
     const [authed, setAuthed] = useState(() => localStorage.getItem('adminAuthed') === 'true');
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('adminUser') || '{}'));
     const [username, setUsername] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
     const [bookings, setBookings] = useState([]);
@@ -46,7 +47,11 @@ const AdminDashboard = () => {
     const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('bookings'); // 'bookings', 'analytics', 'users'
+    const [assessmentStats, setAssessmentStats] = useState({});
     const [selectedAssessmentType, setSelectedAssessmentType] = useState(null);
+    const [selectedDetails, setSelectedDetails] = useState({ assessments: [], dailyTrend: [], monthlyTrend: [] });
+    const [trendView, setTrendView] = useState('month'); // 'day' or 'month'
+    const [loadingDetails, setLoadingDetails] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false); // Mobile sidebar toggle
     const [editingId, setEditingId] = useState(null);
     const [editDate, setEditDate] = useState('');
@@ -161,14 +166,49 @@ const AdminDashboard = () => {
         }
     };
 
+    const fetchAssessmentStats = async (showLoader = false) => {
+        if (showLoader) setLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/assessments/stats`);
+            const data = await res.json();
+            if (data && typeof data === 'object') {
+                setAssessmentStats(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch assessment stats:', error);
+        }
+        if (showLoader) setLoading(false);
+    };
+
+    const fetchAssessmentDetails = async (type) => {
+        setLoadingDetails(true);
+        try {
+            const res = await fetch(`${API_BASE}/assessments?certificationName=${encodeURIComponent(type)}`);
+            const data = await res.json();
+            setSelectedDetails(data);
+        } catch (error) {
+            console.error('Failed to fetch assessment details:', error);
+            setSelectedDetails({ assessments: [], dailyTrend: [], monthlyTrend: [] });
+        }
+        setLoadingDetails(false);
+    };
+
+    useEffect(() => {
+        if (selectedAssessmentType) {
+            fetchAssessmentDetails(selectedAssessmentType);
+        }
+    }, [selectedAssessmentType]);
+
     useEffect(() => {
         if (authed) {
             fetchBookings();
+            fetchAssessmentStats(true);
             if (user.role === 'admin') fetchUsers();
 
             const intervalId = setInterval(() => {
                 // Background polling to catch new bookings so notification sounds can play 
                 fetchBookings(false);
+                fetchAssessmentStats(false);
             }, 10000);
 
             return () => clearInterval(intervalId);
@@ -304,13 +344,32 @@ const AdminDashboard = () => {
                         </div>
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Access Key</label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={e => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-900 font-bold focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 outline-none transition-all placeholder:text-slate-300 text-sm"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 pr-12 text-slate-900 font-bold focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 outline-none transition-all placeholder:text-slate-300 text-sm"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(v => !v)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? (
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
                         </div>
 
                         {loginError && (
@@ -330,9 +389,7 @@ const AdminDashboard = () => {
                         </button>
                     </form>
 
-                    <div className="mt-8 text-center">
-                        <p className="text-slate-400 text-sm font-medium">Protected by RSA Encryption</p>
-                    </div>
+
                 </div>
             </div>
         );
@@ -727,9 +784,7 @@ const AdminDashboard = () => {
                                         </table>
                                     </div>
                                 )}
-                                <div className="px-10 py-8 bg-slate-50/50 border-t border-slate-50 flex items-center justify-center">
-                                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">End of data stream • Radinas Intelligence Layer</p>
-                                </div>
+
                             </div>
                         </>
                     ) : activeTab === 'users' ? (
@@ -985,40 +1040,12 @@ const AdminDashboard = () => {
                         <div className="space-y-8 animate-fadeIn">
                             {!selectedAssessmentType ? (
                                 <>
-                                    <div className="grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-8">
-                                        <div
-                                            onClick={() => setSelectedAssessmentType('HIPAA')}
-                                            className="bg-white p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 cursor-pointer hover:border-indigo-200 transition-all active:scale-95 group"
-                                        >
-                                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 sm:mb-8">
-                                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center text-white"><svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z" /></svg></div>
-                                                <div><h4 className="text-sm sm:text-base font-black text-slate-900 leading-tight">HIPAA Readiness</h4><p className="hidden sm:block text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Physical & Technical Safeguards</p></div>
-                                            </div>
-                                            <div className="space-y-4 sm:space-y-6">
-                                                <div className="flex items-end justify-between"><div><span className="text-xl sm:text-3xl font-black text-slate-900">{bookings.length > 0 ? Math.round((bookings.filter(b => b.type === 'HIPAA').length / bookings.length) * 100) : 0}%</span><span className="hidden sm:inline text-xs font-bold text-slate-400 ml-2 italic">Ready</span></div></div>
-                                                <div className="h-3 sm:h-4 bg-slate-100 rounded-full overflow-hidden p-0.5 sm:p-1"><div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style={{ width: `${bookings.length > 0 ? (bookings.filter(b => b.type === 'HIPAA').length / bookings.length) * 100 : 0}%` }}></div></div>
-                                            </div>
-                                        </div>
-                                        <div
-                                            onClick={() => setSelectedAssessmentType('ISO 27001')}
-                                            className="bg-white p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 cursor-pointer hover:border-indigo-200 transition-all active:scale-95 group"
-                                        >
-                                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 sm:mb-8">
-                                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-600 rounded-xl sm:rounded-2xl flex items-center justify-center text-white"><svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" /></svg></div>
-                                                <div><h4 className="text-sm sm:text-base font-black text-slate-900 leading-tight">ISO 27001</h4><p className="hidden sm:block text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Security Management System</p></div>
-                                            </div>
-                                            <div className="space-y-4 sm:space-y-6">
-                                                <div className="flex items-end justify-between"><div><span className="text-xl sm:text-3xl font-black text-slate-900">{bookings.length > 0 ? Math.round((bookings.filter(b => b.type === 'ISO 27001').length / bookings.length) * 100) : 0}%</span><span className="hidden sm:inline text-xs font-bold text-emerald-500 ml-2 italic">Compliant</span></div></div>
-                                                <div className="h-3 sm:h-4 bg-slate-100 rounded-full overflow-hidden p-0.5 sm:p-1"><div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 rounded-full" style={{ width: `${bookings.length > 0 ? (bookings.filter(b => b.type === 'ISO 27001').length / bookings.length) * 100 : 0}%` }}></div></div>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                         <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50">
                                             <div className="flex items-center justify-between mb-8">
                                                 <div><h4 className="font-black text-slate-900">Test Trends</h4><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Completion distribution</p></div>
-                                                <div className="text-right"><p className="text-2xl font-black text-slate-900">{bookings.length}</p><p className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.2em] mt-1 italic">Total Volume</p></div>
+                                                <div className="text-right"><p className="text-2xl font-black text-slate-900">{Object.values(assessmentStats).reduce((sum, s) => sum + s.count, 0)}</p><p className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.2em] mt-1 italic">Total Volume</p></div>
                                             </div>
                                             <div className="flex items-end justify-between h-48 gap-4 pt-4">
                                                 {[65, 80, 45, 95].map((h, i) => (
@@ -1044,16 +1071,22 @@ const AdminDashboard = () => {
                                         <h4 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight mb-8 sm:mb-10">Assessment Delivery Flow</h4>
                                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6">
                                             {[
-                                                { label: 'FSSC 22000', color: 'indigo' }, { label: 'ISO 22000', color: 'blue' }, { label: 'HACCP', color: 'emerald' }, { label: 'ISO 9001', color: 'slate' }, { label: 'GMP / cGMP', color: 'amber' }, { label: 'OHSA / COR', color: 'rose' }, { label: 'SOC 2 Type II', color: 'violet' }, { label: 'ISO 27001', color: 'purple' }, { label: 'HIPAA', color: 'cyan' }, { label: 'GDPR', color: 'green' }
+                                                { label: 'FSSC 22000', color: 'indigo' },
+                                                { label: 'ISO 22000', color: 'blue' },
+                                                { label: 'HACCP', color: 'emerald' },
+                                                { label: 'ISO 9001', color: 'slate' },
+                                                { label: 'GMP/cGMP', color: 'amber' },
+                                                { label: 'OHSA', color: 'rose' }
                                             ].map(a => {
-                                                const count = bookings.filter(b => b.type === a.label || (a.label === 'SOC 2 Type II' && b.type === 'SOC2 Type 2')).length;
-                                                const pct = bookings.length > 0 ? Math.round((count / bookings.length) * 100) : 0;
+                                                const stats = assessmentStats[a.label] || { count: 0, avgScore: 0 };
+                                                const totalAssessments = Object.values(assessmentStats).reduce((sum, s) => sum + s.count, 0);
+                                                const pct = totalAssessments > 0 ? Math.round((stats.count / totalAssessments) * 100) : 0;
                                                 return (
                                                     <div key={a.label} onClick={() => setSelectedAssessmentType(a.label)} className="p-4 sm:p-5 bg-slate-50/50 rounded-2xl sm:rounded-3xl border border-slate-100 hover:bg-white hover:shadow-lg hover:border-indigo-200 transition-all cursor-pointer group active:scale-95">
                                                         <p className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 sm:mb-3 line-clamp-1 group-hover:text-indigo-600">{a.label}</p>
                                                         <div className="flex items-end justify-between">
                                                             <div>
-                                                                <span className="text-xl sm:text-2xl font-black text-slate-900">{count}</span>
+                                                                <span className="text-xl sm:text-2xl font-black text-slate-900">{stats.count}</span>
                                                             </div>
                                                             <span className="text-[8px] sm:text-[10px] font-black text-emerald-500">{pct}%</span>
                                                         </div>
@@ -1067,25 +1100,137 @@ const AdminDashboard = () => {
                                 <div className="space-y-8">
                                     <div className="flex items-center justify-between"><div className="flex items-center gap-6"><button onClick={() => setSelectedAssessmentType(null)} className="w-12 h-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 hover:text-indigo-600 shadow-sm transition-all"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M15 19l-7-7 7-7" /></svg></button><div><h3 className="text-2xl font-black text-slate-900">{selectedAssessmentType} Detail Analysis</h3><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Granular framework performance</p></div></div></div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Respondents</p><span className="text-4xl font-black text-slate-900">{bookings.filter(b => b.type === selectedAssessmentType || (selectedAssessmentType === 'SOC 2 Type II' && b.type === 'SOC2 Type 2')).length}</span></div>
-                                        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Market Share</p><span className="text-4xl font-black text-slate-900">{bookings.length > 0 ? Math.round((bookings.filter(b => b.type === selectedAssessmentType || (selectedAssessmentType === 'SOC 2 Type II' && b.type === 'SOC2 Type 2')).length / bookings.length) * 100) : 0}%</span></div>
-                                        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Performance</p><span className="text-4xl font-black text-slate-900 italic">High</span></div>
+                                        {(() => {
+                                            const stats = assessmentStats[selectedAssessmentType] || { count: 0 };
+                                            const totalAssessments = Object.values(assessmentStats).reduce((sum, s) => sum + s.count, 0);
+                                            const marketShare = totalAssessments > 0 ? Math.round((stats.count / totalAssessments) * 100) : 0;
+                                            return (
+                                                <>
+                                                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50">
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Respondents</p>
+                                                        <span className="text-4xl font-black text-slate-900">{stats.count}</span>
+                                                    </div>
+                                                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50">
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Market Share</p>
+                                                        <span className="text-4xl font-black text-slate-900">{marketShare}%</span>
+                                                    </div>
+                                                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50">
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Performance</p>
+                                                        <span className="text-4xl font-black text-slate-900 italic">High</span>
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
                                     </div>
-                                    <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-2xl">
-                                        <h4 className="text-lg font-black text-slate-900 tracking-tight mb-12">Timeline Adoption Trend</h4>
-                                        <div className="h-64 flex items-end justify-between gap-8 pt-6">
-                                            {[65, 80, 45, 95, 70, 85].map((h, i) => (
-                                                <div key={i} className="flex-1 flex flex-col items-center gap-6 group">
-                                                    <div className="w-full bg-slate-50 rounded-2xl relative overflow-hidden flex items-end h-full"><div className="w-full bg-gradient-to-t from-indigo-600 to-violet-500 rounded-t-2xl group-hover:from-indigo-500 group-hover:to-violet-400 transition-all duration-500" style={{ height: `${h}%` }}></div></div>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'][i]}</span>
+                                    <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 shadow-2xl">
+                                        <div className="flex items-center justify-between mb-8">
+                                            <div>
+                                                <h4 className="text-lg font-black text-slate-900 tracking-tight">Timeline Adoption Trend</h4>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Completion distribution</p>
+                                            </div>
+                                            <div className="flex bg-slate-100 p-1.5 rounded-2xl">
+                                                <button
+                                                    onClick={() => setTrendView('day')}
+                                                    className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${trendView === 'day' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                                >
+                                                    By Day
+                                                </button>
+                                                <button
+                                                    onClick={() => setTrendView('month')}
+                                                    className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${trendView === 'month' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                                >
+                                                    By Month
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="h-16 flex items-end justify-between gap-4 pt-6">
+                                            {loadingDetails ? (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                                                 </div>
-                                            ))}
+                                            ) : (
+                                                ((trendView === 'day' ? selectedDetails?.dailyTrend : selectedDetails?.monthlyTrend) || []).slice(-12).map((item, i) => {
+                                                    const trendData = (trendView === 'day' ? selectedDetails?.dailyTrend : selectedDetails?.monthlyTrend) || [];
+                                                    const maxCount = Math.max(...trendData.map(d => d.count), 1);
+                                                    const h = (item.count / maxCount) * 100;
+                                                    const label = trendView === 'day' ? item._id?.split('-')?.slice(1)?.join('/') : item._id?.split('-')?.[1]; // mm/dd or mm
+                                                    return (
+                                                        <div key={i} className="flex-1 flex flex-col items-center gap-3 group">
+                                                            <div className="w-full bg-slate-50 rounded-lg relative overflow-hidden flex items-end h-full">
+                                                                <div className="w-full bg-gradient-to-t from-indigo-600 to-violet-500 rounded-t-lg group-hover:from-indigo-500 group-hover:to-violet-400 transition-all duration-500 relative" style={{ height: `${h}%` }}>
+                                                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                                                        {item.count} Tests
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{label || '??'}</span>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
+                                            {(!loadingDetails && ((trendView === 'day' ? selectedDetails?.dailyTrend : selectedDetails?.monthlyTrend) || []).length === 0) && (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold italic">No data available for this range</div>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="bg-slate-900 p-10 rounded-[3rem] text-white relative overflow-hidden">
-                                        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full blur-[100px] opacity-20"></div>
-                                        <h4 className="text-lg font-black tracking-tight mb-6 italic">Radinas Intelligence Summary</h4>
-                                        <p className="text-slate-400 leading-relaxed font-medium">The <span className="text-white font-black">{selectedAssessmentType}</span> framework has shown a consistent adoption curve. Current points towards strategic engagement expansion across critical segments.</p>
+
+                                    {/* Respondents Detail Table */}
+                                    <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl overflow-hidden">
+                                        <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between">
+                                            <h4 className="text-lg font-black text-slate-900 tracking-tight">Detailed Respondents Report</h4>
+                                            <span className="px-5 py-2 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">{selectedDetails.assessments.length} Total</span>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full">
+                                                <thead>
+                                                    <tr className="bg-slate-50/50">
+                                                        <th className="px-10 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Name / Company</th>
+                                                        <th className="px-10 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Contact Info</th>
+                                                        <th className="px-10 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Score & Result</th>
+                                                        <th className="px-10 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Completion Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-50">
+                                                    {loadingDetails ? (
+                                                        <tr>
+                                                            <td colSpan="4" className="px-10 py-20 text-center">
+                                                                <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                                                            </td>
+                                                        </tr>
+                                                    ) : (selectedDetails?.assessments || []).length > 0 ? (
+                                                        (selectedDetails?.assessments || []).map((item, idx) => (
+                                                            <tr key={idx} className="hover:bg-slate-50/50 transition-colors group">
+                                                                <td className="px-10 py-6">
+                                                                    <p className="font-black text-slate-900 group-hover:text-indigo-600 transition-colors">{item.contactInfo?.name}</p>
+                                                                    <p className="text-xs font-bold text-slate-400">{item.contactInfo?.company}</p>
+                                                                </td>
+                                                                <td className="px-10 py-6">
+                                                                    <p className="text-xs font-bold text-slate-900">{item.contactInfo?.email}</p>
+                                                                    <p className="text-[10px] font-bold text-slate-400">{item.contactInfo?.phone}</p>
+                                                                </td>
+                                                                <td className="px-10 py-6">
+                                                                    <div className="flex items-center gap-4">
+                                                                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black text-white ${item.tier === 'Green' ? 'bg-emerald-500' :
+                                                                            item.tier === 'Amber' ? 'bg-amber-500' : 'bg-rose-500'
+                                                                            }`}>
+                                                                            {item.score}% {item.tier}
+                                                                        </span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-10 py-6">
+                                                                    <p className="text-xs font-black text-slate-900">{item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : 'N/A'}</p>
+                                                                    <p className="text-[10px] font-bold text-slate-400">{item.createdAt ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                                                                </td>
+                                                            </tr>
+                                                        ))
+                                                    ) : (
+                                                        <tr>
+                                                            <td colSpan="4" className="px-10 py-20 text-center text-slate-400 font-bold italic">No respondents found for this framework</td>
+                                                        </tr>
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             )}
