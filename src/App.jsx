@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Wizard from './pages/Wizard';
 import Results from './pages/Results';
 import AdminDashboard from './pages/AdminDashboard';
+import CookieConsent from './components/common/CookieConsent';
 
 /**
  * Main Application Component.
@@ -26,6 +27,7 @@ function App() {
           {/* Admin Dashboard */}
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
+        <CookieConsent />
       </div>
     </Router>
   );

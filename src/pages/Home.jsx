@@ -10,6 +10,13 @@ const Home = () => {
     const [timeline, setTimeline] = useState('');
     const [loading, setLoading] = useState(true);
     const [isHuman, setIsHuman] = useState(false);
+    const [hasConsented, setHasConsented] = useState(!!localStorage.getItem('cookieConsent'));
+
+    useEffect(() => {
+        const checkConsent = () => setHasConsented(!!localStorage.getItem('cookieConsent'));
+        window.addEventListener('storage', checkConsent);
+        return () => window.removeEventListener('storage', checkConsent);
+    }, []);
 
     useEffect(() => {
         const fetchCerts = async () => {
@@ -201,6 +208,37 @@ const Home = () => {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Explicit Cookie Consent Option */}
+                            {!hasConsented && (
+                                <div className="bg-slate-50 rounded-2xl p-6 border-2 border-slate-100 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-2xl rounded-full -mr-12 -mt-12"></div>
+                                    <div className="relative">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-sm font-bold text-slate-900">Cookie Preference</span>
+                                        </div>
+                                        <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                                            We use cookies to enhance your experience. By clicking "Start Assessment", you accept our use of cookies.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                localStorage.setItem('cookieConsent', 'true');
+                                                window.dispatchEvent(new Event('storage')); // Notify all components
+                                                setHasConsented(true);
+                                            }}
+                                            className="text-[11px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-700 transition-colors"
+                                        >
+                                            Accept All Cookies Now
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             <button
                                 type="submit"

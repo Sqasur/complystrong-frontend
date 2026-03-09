@@ -18,6 +18,13 @@ const Wizard = () => {
     const [submitting, setSubmitting] = useState(false);
     const [showLeadForm, setShowLeadForm] = useState(false);
     const [leadData, setLeadData] = useState({ name: '', company: '', email: '', phone: '' });
+    const [hasConsented, setHasConsented] = useState(!!localStorage.getItem('cookieConsent'));
+
+    useEffect(() => {
+        const checkConsent = () => setHasConsented(!!localStorage.getItem('cookieConsent'));
+        window.addEventListener('storage', checkConsent);
+        return () => window.removeEventListener('storage', checkConsent);
+    }, []);
 
     useEffect(() => {
         if (!certId) {
@@ -56,7 +63,7 @@ const Wizard = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent form submission reload
+        e.preventDefault();
         setSubmitting(true);
         try {
             const result = await apiService.submitAssessment(certId, Object.values(answers), leadData);
@@ -64,7 +71,7 @@ const Wizard = () => {
         } catch (error) {
             console.error('Submission failed', error);
             setSubmitting(false);
-            // Optionally could add a user-visible error here
+
         }
     };
 
@@ -113,7 +120,27 @@ const Wizard = () => {
                             <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white text-[11px] sm:text-xs font-bold rounded-[24px] uppercase tracking-widest leading-none flex items-center shadow-md shadow-indigo-100/50">
                                 {questions[currentIndex]?.category || 'Documentation'}
                             </span>
-                            <span className="font-bold text-slate-500">{`${Math.round(progress)}% Complete`}</span>
+                            {/* Cookie Consent Indicator for Wizard */}
+                            {!hasConsented && (
+                                <button
+                                    onClick={() => {
+                                        localStorage.setItem('cookieConsent', 'true');
+                                        window.dispatchEvent(new Event('storage'));
+                                        setHasConsented(true);
+                                    }}
+                                    className="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl hover:bg-white transition-all group"
+                                >
+                                    <div className="w-6 h-6 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Accept Cookies</span>
+                                </button>
+                            )}
+                            <div className="flex flex-col items-end">
+                                <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{progress.toFixed(0)}% Complete</span>
+                            </div>
                         </div>
                         <ProgressBar progress={progress} />
                     </div>

@@ -57,7 +57,58 @@ const AdminDashboard = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [editForm, setEditForm] = useState({ id: '', name: '', username: '', password: '', role: 'manager', phone: '' });
     const [userToDelete, setUserToDelete] = useState(null);
+    const [settingsForm, setSettingsForm] = useState({ name: '', username: '', email: '', phone: '', currentPassword: '', newPassword: '', confirmPassword: '' });
+    const [settingsInfo, setSettingsInfo] = useState({ error: '', success: '', loading: false });
+    const [settingsSubTab, setSettingsSubTab] = useState('profile'); // 'profile' or 'password'
     const prevPendingCountRef = useRef(null);
+
+    useEffect(() => {
+        if (activeTab === 'settings' && user) {
+            setSettingsSubTab('profile');
+            setSettingsForm({
+                name: user.name || '',
+                username: user.username || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            });
+            setSettingsInfo({ error: '', success: '', loading: false });
+        }
+    }, [activeTab, user]);
+
+    const handleUpdateProfile = async (e) => {
+        e.preventDefault();
+        setSettingsInfo({ error: '', success: '', loading: true });
+
+        if (settingsForm.newPassword && settingsForm.newPassword !== settingsForm.confirmPassword) {
+            setSettingsInfo({ error: 'Passwords do not match', success: '', loading: false });
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE}/auth/profile`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-id': user.id
+                },
+                body: JSON.stringify(settingsForm),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setUser(data.user);
+                localStorage.setItem('adminUser', JSON.stringify(data.user));
+                setSettingsInfo({ error: '', success: 'Profile updated successfully!', loading: false });
+                setSettingsForm(prev => ({ ...prev, currentPassword: '', newPassword: '', confirmPassword: '' }));
+            } else {
+                setSettingsInfo({ error: data.error || 'Update failed', success: '', loading: false });
+            }
+        } catch {
+            setSettingsInfo({ error: 'Connection error', success: '', loading: false });
+        }
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -303,7 +354,7 @@ const AdminDashboard = () => {
                 ${showSidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 w-72 bg-white border-r border-slate-100 flex flex-col shrink-0
             `}>
-                <div className="p-8 pb-10 text-center">
+                <div className="p-8 pb-4 text-center">
                     <div className="flex items-center gap-3 group justify-center">
                         <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center transition-all duration-500 shadow-lg shadow-slate-200">
                             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -322,7 +373,7 @@ const AdminDashboard = () => {
                         { id: 'bookings', label: 'Bookings', icon: <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />, badge: counts.pending },
                         { id: 'analytics', label: 'Analytics', icon: <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /> },
                         { id: 'users', label: 'Manage Users', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /> },
-                        { id: 'settings', label: 'Settings', icon: <><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></>, disabled: true },
+                        { id: 'settings', label: 'Settings', icon: <><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></> },
                     ].map(item => (
                         <button
                             key={item.id}
@@ -348,7 +399,29 @@ const AdminDashboard = () => {
                     ))}
                 </nav>
 
-                <div className="p-6">
+                <div className="p-4 mt-auto">
+                    {/* User Profile Card */}
+                    <div className="bg-slate-50/50 rounded-3xl p-5 mb-2">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shrink-0">
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <div className="text-left flex-1 min-w-0">
+                                <p className="text-sm font-black text-slate-900 truncate">
+                                    {user.name || user.username || 'System Admin'}
+                                </p>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                        {user.role === 'admin' ? 'Administrator' : 'Manager'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button
                         onClick={() => { localStorage.removeItem('adminAuthed'); localStorage.removeItem('adminUser'); setAuthed(false); }}
                         className="w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-sm text-rose-500 hover:bg-rose-50 transition-all group"
@@ -418,6 +491,8 @@ const AdminDashboard = () => {
                                 </span>
                             )}
                         </button>
+
+
 
                         <button
                             onClick={async () => {
@@ -750,6 +825,161 @@ const AdminDashboard = () => {
                                 </div>
                             </div>
                         )
+                    ) : activeTab === 'settings' ? (
+                        <div className="max-w-4xl mx-auto animate-fadeIn">
+                            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+                                <div className="bg-indigo-600 px-10 py-10 text-white relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                                    <div className="relative z-10 flex items-center justify-between">
+                                        <div className="flex items-center gap-6">
+                                            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-2xl">
+                                                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-2xl font-black tracking-tight">Account Settings</h3>
+                                                <p className="text-indigo-100 font-bold uppercase tracking-widest text-[9px] mt-1">Personalize your system preferences</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Internal Tabs Selection */}
+                                <div className="flex border-b border-slate-100 px-10 bg-slate-50/50">
+                                    {[
+                                        { id: 'profile', label: 'Personal Information', icon: <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> },
+                                        { id: 'password', label: 'Password & Security', icon: <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /> }
+                                    ].map(tab => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => setSettingsSubTab(tab.id)}
+                                            className={`flex items-center gap-3 px-8 py-5 text-xs font-black uppercase tracking-widest transition-all border-b-2 relative ${settingsSubTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                        >
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>{tab.icon}</svg>
+                                            {tab.label}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <form onSubmit={handleUpdateProfile} className="p-10 space-y-10">
+                                    {(settingsInfo.error || settingsInfo.success) && (
+                                        <div className={`${settingsInfo.error ? 'bg-rose-50 border-rose-100 text-rose-600 animate-shake' : 'bg-emerald-50 border-emerald-100 text-emerald-600 animate-fadeIn'} border px-6 py-4 rounded-2xl flex items-center gap-3`}>
+                                            <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                {settingsInfo.error ? (
+                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                ) : (
+                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                )}
+                                            </svg>
+                                            <span className="text-sm font-black">{settingsInfo.error || settingsInfo.success}</span>
+                                        </div>
+                                    )}
+
+                                    {settingsSubTab === 'profile' ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 animate-fadeIn">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-black uppercase tracking-widest ml-1">Full Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={settingsForm.name}
+                                                    onChange={e => setSettingsForm({ ...settingsForm, name: e.target.value })}
+                                                    required
+                                                    className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-bold text-black focus:bg-white focus:border-indigo-400 outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-black uppercase tracking-widest ml-1">Username / Login ID</label>
+                                                <input
+                                                    type="text"
+                                                    value={settingsForm.username}
+                                                    onChange={e => setSettingsForm({ ...settingsForm, username: e.target.value })}
+                                                    required
+                                                    className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-bold text-black focus:bg-white focus:border-indigo-400 outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-black uppercase tracking-widest ml-1">Email Address</label>
+                                                <input
+                                                    type="email"
+                                                    value={settingsForm.email}
+                                                    onChange={e => setSettingsForm({ ...settingsForm, email: e.target.value })}
+                                                    className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-bold text-black focus:bg-white focus:border-indigo-400 outline-none transition-all"
+                                                    placeholder="your@email.com"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-black uppercase tracking-widest ml-1">Phone Number</label>
+                                                <input
+                                                    type="text"
+                                                    value={settingsForm.phone}
+                                                    onChange={e => setSettingsForm({ ...settingsForm, phone: e.target.value })}
+                                                    className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-bold text-black focus:bg-white focus:border-indigo-400 outline-none transition-all"
+                                                    placeholder="+1 234 567 890"
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-8 animate-fadeIn">
+                                            <div className="bg-slate-50/50 p-8 rounded-3xl border border-dotted border-slate-200">
+                                                <div className="max-w-md mx-auto space-y-6">
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-black uppercase tracking-widest ml-1 italic decoration-indigo-500/30 underline">Current Password (Required for updates)</label>
+                                                        <input
+                                                            type="password"
+                                                            value={settingsForm.currentPassword}
+                                                            onChange={e => setSettingsForm({ ...settingsForm, currentPassword: e.target.value })}
+                                                            required={settingsForm.newPassword !== ''}
+                                                            className="w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold text-black focus:border-indigo-400 outline-none transition-all"
+                                                            placeholder="••••••••"
+                                                        />
+                                                    </div>
+                                                    <div className="h-px bg-slate-100"></div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-black uppercase tracking-widest ml-1">New Password</label>
+                                                        <input
+                                                            type="password"
+                                                            value={settingsForm.newPassword}
+                                                            onChange={e => setSettingsForm({ ...settingsForm, newPassword: e.target.value })}
+                                                            className="w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold text-black focus:border-indigo-400 outline-none transition-all"
+                                                            placeholder="Leave blank to keep current"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-black uppercase tracking-widest ml-1">Confirm New Password</label>
+                                                        <input
+                                                            type="password"
+                                                            value={settingsForm.confirmPassword}
+                                                            onChange={e => setSettingsForm({ ...settingsForm, confirmPassword: e.target.value })}
+                                                            className="w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold text-black focus:border-indigo-400 outline-none transition-all"
+                                                            placeholder="••••••••"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="pt-6 border-t border-slate-50">
+                                        <button
+                                            type="submit"
+                                            disabled={settingsInfo.loading}
+                                            className="w-full sm:w-auto px-12 py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200/50 flex items-center justify-center gap-4 group"
+                                        >
+                                            {settingsInfo.loading ? (
+                                                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                            ) : (
+                                                <>
+                                                    Commit Changes
+                                                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     ) : (
                         <div className="space-y-8 animate-fadeIn">
                             {!selectedAssessmentType ? (
