@@ -204,8 +204,8 @@ const Wizard = () => {
                         )}
 
                         <div className="text-center mb-8">
-                            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-600">
-                                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <div className="flex items-center justify-center mx-auto mb-6 text-emerald-500">
+                                <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
@@ -274,7 +274,7 @@ const Wizard = () => {
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="w-full bg-emerald-600 text-white rounded-xl py-3.5 font-bold uppercase tracking-widest mt-6 hover:bg-emerald-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-emerald-600/20"
+                                className="w-full bg-indigo-600 text-white rounded-xl py-3.5 font-bold uppercase tracking-widest mt-6 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/20"
                             >
                                 {submitting ? (
                                     <span className="flex items-center justify-center gap-2">
