@@ -267,12 +267,20 @@ const BookingModal = ({ isOpen, onClose }) => {
                             <p className="text-slate-500 mb-8 max-w-sm mx-auto">
                                 We've sent a calendar invitation to <strong className="text-slate-900">{formData.email}</strong> for {formData.date} at {formData.time}.
                             </p>
-                            <button
-                                onClick={onClose}
-                                className="bg-slate-100 text-slate-900 px-8 py-3 rounded-xl font-bold hover:bg-slate-200 transition-colors"
-                            >
-                                Back to Results
-                            </button>
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                <button
+                                    onClick={onClose}
+                                    className="bg-slate-100 text-slate-900 px-8 py-3 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+                                >
+                                    Back to Results
+                                </button>
+                                <button
+                                    onClick={() => window.location.assign('https://complystrong.com/')}
+                                    className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+                                >
+                                    Back to Home
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

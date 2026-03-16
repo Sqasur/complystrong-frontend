@@ -103,11 +103,13 @@ const Wizard = () => {
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                     </button>
-                    <img
-                        src="https://complystrong.com/wp-content/uploads/2025/12/logo_compliance_program.png"
-                        alt="ComplyStrong"
-                        className="h-8 sm:h-10 object-contain"
-                    />
+                    <div className="cursor-pointer transition-transform hover:scale-105" onClick={() => navigate('/')}>
+                        <img
+                            src="https://complystrong.com/wp-content/uploads/2025/12/logo_compliance_program.png"
+                            alt="ComplyStrong"
+                            className="h-8 sm:h-10 object-contain"
+                        />
+                    </div>
                 </div>
                 <div className="absolute left-1/2 transform -translate-x-1/2 text-center hidden sm:block w-1/3">
                     <h2 className="text-sm sm:text-base font-black text-black uppercase tracking-widest truncate">{certification?.name}</h2>
