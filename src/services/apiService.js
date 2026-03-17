@@ -3,9 +3,6 @@ import { MOCK_CERTIFICATIONS, MOCK_QUESTIONS } from '../mocks/mockData';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
-/**
- * Computes assessment results entirely client-side from answers and questions.
- */
 function computeLocalResult(certificationId, answers, questions, contactInfo) {
     const certification = MOCK_CERTIFICATIONS.find(c => c._id === certificationId) || { _id: certificationId, name: 'Unknown' };
     const questionMap = new Map(questions.map(q => [q._id, q]));
@@ -19,7 +16,7 @@ function computeLocalResult(certificationId, answers, questions, contactInfo) {
         if (!question) return;
 
         const rawScore = Number(answer?.selectedOption?.score);
-        if (rawScore === -1) return; // N/A
+        if (rawScore === -1) return; 
 
         const weight = Number(question.weight) || 1;
         const maxQ = 2 * weight;
@@ -60,9 +57,6 @@ function computeLocalResult(certificationId, answers, questions, contactInfo) {
     };
 }
 
-/**
- * Gets questions for a certification (for local fallback use).
- */
 function getLocalQuestions(certificationId) {
     let questions = [...MOCK_QUESTIONS.CORE];
     if (certificationId === '1') questions = [...questions, ...(MOCK_QUESTIONS.FSSC_ADDONS || [])];
@@ -74,10 +68,6 @@ function getLocalQuestions(certificationId) {
     return questions;
 }
 
-/**
- * API service to handle all network requests.
- * Includes fallback to client-side computation when API is unavailable.
- */
 const apiService = {
     async getCertifications() {
         try {
@@ -111,17 +101,17 @@ const apiService = {
             return response.data;
         } catch (error) {
             console.warn('API submitAssessment failed, computing result locally.', error);
-            // Compute real result from actual answers client-side
+            
             const questions = getLocalQuestions(certificationId);
             const result = computeLocalResult(certificationId, answers, questions, contactInfo);
-            // Store in sessionStorage so Results page can read it
+            
             sessionStorage.setItem('localResult', JSON.stringify(result));
             return result;
         }
     },
 
     async getAssessment(id) {
-        // If this is a local result, read from sessionStorage
+        
         if (id === 'local') {
             const stored = sessionStorage.getItem('localResult');
             if (stored) return JSON.parse(stored);
@@ -131,7 +121,7 @@ const apiService = {
             return response.data;
         } catch (error) {
             console.warn('API getAssessment failed.', error);
-            // Try sessionStorage as last resort
+            
             const stored = sessionStorage.getItem('localResult');
             if (stored) return JSON.parse(stored);
             return null;
@@ -140,4 +130,3 @@ const apiService = {
 };
 
 export default apiService;
-

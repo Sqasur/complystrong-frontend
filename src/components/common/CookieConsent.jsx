@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-/**
- * Premium Cookie Consent Banner.
- * Features a blurred background, slide-up animation, and localStorage persistence.
- */
 const CookieConsent = () => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Check if user has already accepted cookies
+        
         const consent = localStorage.getItem('cookieConsent');
         if (!consent) {
-            // Delay showing the banner for better UX
+            
             const timer = setTimeout(() => setIsVisible(true), 1500);
             return () => clearTimeout(timer);
         }
@@ -27,7 +23,7 @@ const CookieConsent = () => {
     return (
         <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-8 md:max-w-md z-[100] animate-slideUp">
             <div className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[2.5rem] p-8 relative overflow-hidden group transition-all duration-500 hover:shadow-[0_25px_60px_rgba(0,0,0,0.2)]">
-                {/* Background Accent */}
+                {}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-indigo-500/10 transition-colors duration-500"></div>
 
                 <div className="relative">

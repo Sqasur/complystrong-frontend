@@ -1,8 +1,5 @@
 import React from 'react';
 
-/**
- * Component for displaying an individual question and its options.
- */
 const QuestionCard = ({ question, currentAnswer, onOptionSelect }) => {
     if (!question) return null;
 

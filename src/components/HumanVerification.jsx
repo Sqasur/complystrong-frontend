@@ -32,7 +32,7 @@ const HumanVerification = ({ onVerified }) => {
             }}
             onClick={handleVerify}
         >
-            {/* Left: Checkbox + Label */}
+            {}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div
                     style={{
@@ -110,7 +110,7 @@ const HumanVerification = ({ onVerified }) => {
                 </span>
             </div>
 
-            {/* Inline keyframes */}
+            {}
             <style>{`
                 @keyframes spin {
                     to { transform: rotate(360deg); }

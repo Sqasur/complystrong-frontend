@@ -54,7 +54,7 @@ const Results = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
-            {/* Header */}
+            {}
             <div className="bg-white border-b border-slate-100 px-6 py-12">
                 <div className="max-w-4xl mx-auto text-center">
                     <p className="text-xs font-black text-indigo-600 uppercase tracking-[0.2em] mb-4">Assessment Complete</p>
@@ -69,7 +69,7 @@ const Results = () => {
 
             <div className="max-w-4xl mx-auto px-6 -mt-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Score Card */}
+                    {}
                     <div className="md:col-span-2 bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 flex flex-col items-center justify-center text-center relative overflow-hidden border border-slate-50">
                         <div className={`absolute top-0 inset-x-0 h-2 ${tier.color.replace('text', 'bg')}`}></div>
                         <div className={`text-7xl font-black mb-2 ${tier.color}`}>
@@ -83,7 +83,7 @@ const Results = () => {
                         </div>
                     </div>
 
-                    {/* Quick Stats */}
+                    {}
                     <div className="bg-slate-900 rounded-3xl p-8 flex flex-col justify-center text-white shadow-xl">
                         <div className="mb-6">
                             <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Gaps Found</p>
@@ -98,7 +98,7 @@ const Results = () => {
                     </div>
                 </div>
 
-                {/* Gaps Section */}
+                {}
                 <div className="mt-12">
                     <h2 className="text-2xl font-black text-slate-900 mb-8 flex items-center">
                         Top Priority Gaps
@@ -143,7 +143,7 @@ const Results = () => {
                     </div>
                 </div>
 
-                {/* CTA Section */}
+                {}
                 <div className="mt-16 bg-white rounded-[2rem] p-10 shadow-2xl shadow-indigo-100 border border-indigo-50 text-center">
                     <h3 className="text-2xl font-black text-slate-900 mb-4">Need help closing these gaps?</h3>
                     <p className="text-slate-500 mb-8 max-w-md mx-auto font-medium">

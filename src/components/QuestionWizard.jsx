@@ -18,8 +18,7 @@ const QuestionWizard = ({ certification, questions, answers, onAnswerChange, onS
   };
 
   const buildOptionPayload = (value) => {
-    // Map fixed options to a simple scoring model
-    // Yes = 2, Partial = 1, No = 0, N/A = -1 (ignored in scoring)
+
     const mapping = {
       yes: 2,
       partial: 1,

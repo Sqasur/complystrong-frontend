@@ -52,7 +52,7 @@ const AdminDashboard = () => {
     const [selectedDetails, setSelectedDetails] = useState({ assessments: [], dailyTrend: [], monthlyTrend: [] });
     const [trendView, setTrendView] = useState('month'); // 'day' or 'month'
     const [loadingDetails, setLoadingDetails] = useState(false);
-    const [showSidebar, setShowSidebar] = useState(false); // Mobile sidebar toggle
+    const [showSidebar, setShowSidebar] = useState(false); 
     const [editingId, setEditingId] = useState(null);
     const [editDate, setEditDate] = useState('');
     const [editTime, setEditTime] = useState('');
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
     const [userToDelete, setUserToDelete] = useState(null);
     const [settingsForm, setSettingsForm] = useState({ name: '', username: '', email: '', phone: '', currentPassword: '', newPassword: '', confirmPassword: '' });
     const [settingsInfo, setSettingsInfo] = useState({ error: '', success: '', loading: false });
-    const [settingsSubTab, setSettingsSubTab] = useState('profile'); // 'profile' or 'password'
+    const [settingsSubTab, setSettingsSubTab] = useState('profile'); 
     const prevPendingCountRef = useRef(null);
 
     useEffect(() => {
@@ -152,8 +152,6 @@ const AdminDashboard = () => {
         if (showLoader) setLoading(false);
     };
 
-
-
     const fetchUsers = async () => {
         try {
             const res = await fetch(`${API_BASE}/auth/users`, {
@@ -206,7 +204,7 @@ const AdminDashboard = () => {
             if (user.role === 'admin') fetchUsers();
 
             const intervalId = setInterval(() => {
-                // Background polling to catch new bookings so notification sounds can play 
+                
                 fetchBookings(false);
                 fetchAssessmentStats(false);
             }, 10000);
@@ -389,7 +387,6 @@ const AdminDashboard = () => {
                         </button>
                     </form>
 
-
                 </div>
             </div>
         );
@@ -397,7 +394,7 @@ const AdminDashboard = () => {
 
     return (
         <div className={`min-h-screen flex ${activeTab === 'analytics' ? 'bg-white' : 'bg-[#f8fafc]'} relative`}>
-            {/* Sidebar Overlay for Mobile */}
+            {}
             {showSidebar && (
                 <div
                     className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 lg:hidden transition-all duration-300"
@@ -405,7 +402,7 @@ const AdminDashboard = () => {
                 />
             )}
 
-            {/* Sidebar */}
+            {}
             <div className={`
                 fixed lg:sticky top-0 h-screen z-50 transition-all duration-300 ease-in-out
                 ${showSidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -457,7 +454,7 @@ const AdminDashboard = () => {
                 </nav>
 
                 <div className="p-4 mt-auto">
-                    {/* User Profile Card */}
+                    {}
                     <div className="bg-slate-50/50 rounded-3xl p-5 mb-2">
                         <div className="flex items-center gap-4">
                             <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shrink-0">
@@ -493,7 +490,7 @@ const AdminDashboard = () => {
                 </div>
             </div>
 
-            {/* Main Content Area */}
+            {}
             <div className="flex-1 overflow-y-auto h-screen scroll-smooth">
                 <div className="bg-white/50 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-10 py-6 sticky top-0 z-20">
                     <div>
@@ -530,7 +527,7 @@ const AdminDashboard = () => {
                             />
                         </div>
 
-                        {/* Notification Bell */}
+                        {}
                         <button
                             onClick={() => {
                                 setActiveTab('bookings');
@@ -548,8 +545,6 @@ const AdminDashboard = () => {
                                 </span>
                             )}
                         </button>
-
-
 
                         <button
                             onClick={async () => {
@@ -820,7 +815,6 @@ const AdminDashboard = () => {
                                     </button>
                                 </div>
 
-
                                 <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-50">
                                     <div className="overflow-x-auto">
                                         <table className="w-full min-w-max">
@@ -902,7 +896,7 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
 
-                                {/* Internal Tabs Selection */}
+                                {}
                                 <div className="flex border-b border-slate-100 px-10 bg-slate-50/50">
                                     {[
                                         { id: 'profile', label: 'Personal Information', icon: <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> },
@@ -1174,7 +1168,7 @@ const AdminDashboard = () => {
                                         </div>
                                     </div>
 
-                                    {/* Respondents Detail Table */}
+                                    {}
                                     <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl overflow-hidden">
                                         <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between">
                                             <h4 className="text-lg font-black text-slate-900 tracking-tight">Detailed Respondents Report</h4>
@@ -1239,7 +1233,7 @@ const AdminDashboard = () => {
                 </div>
             </div>
 
-            {/* Edit User Modal */}
+            {}
             {isEditModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsEditModalOpen(false)}></div>
@@ -1326,7 +1320,7 @@ const AdminDashboard = () => {
                 </div>
             )}
 
-            {/* Add User Modal */}
+            {}
             {isAddModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsAddModalOpen(false)}></div>
@@ -1415,7 +1409,7 @@ const AdminDashboard = () => {
                 </div>
             )}
 
-            {/* Delete User Modal */}
+            {}
             {isDeleteModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsDeleteModalOpen(false)}></div>

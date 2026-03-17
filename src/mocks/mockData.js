@@ -1,9 +1,3 @@
-/**
- * Mock data for certifications and questions.
- * This file serves as a fallback when the backend is unavailable
- * and as a reference for the data structure.
- */
-
 export const MOCK_CERTIFICATIONS = [
     { _id: '1', name: 'FSSC 22000' },
     { _id: '2', name: 'ISO 22000' },

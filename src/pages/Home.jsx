@@ -73,15 +73,13 @@ const Home = () => {
             <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
                 <div className="flex flex-col items-center text-center">
 
-
                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">Verification Required</h1>
                     <p className="text-slate-400 text-sm mb-8 max-w-[280px]">
                         Please confirm you are human to access the Readiness Compliance Portal.
                     </p>
 
-                    {/* reCAPTCHA widget */}
+                    {}
                     <HumanVerification onVerified={() => setIsHuman(true)} />
-
 
                 </div>
             </div>
@@ -90,9 +88,9 @@ const Home = () => {
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
-            {/* Top Navigation Bar */}
+            {}
             <nav className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6 sm:px-12 sticky top-0 z-40">
-                {/* Left: Logo */}
+                {}
                 <div className="flex items-center">
                     <div className="group cursor-pointer" onClick={() => window.location.assign('https://complystrong.com/')}>
                         <div className="w-24 sm:w-28 h-10 sm:h-12 flex items-center justify-start transition-transform duration-500 overflow-hidden hover:scale-105">
@@ -105,7 +103,7 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Center: Home Link (Responsive centering via flex-grow and absolute Positioning) */}
+                {}
                 <div className="absolute left-1/2 -translate-x-1/2">
                     <button
                         onClick={() => window.location.assign('https://complystrong.com/')}
@@ -115,11 +113,11 @@ const Home = () => {
                     </button>
                 </div>
 
-                {/* Right: Empty for spacing */}
+                {}
                 <div className="w-24 sm:w-28"></div>
             </nav>
 
-            {/* Main Content Area */}
+            {}
             <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 relative">
                 <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     <div className="text-center lg:text-left">
@@ -198,7 +196,7 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            {/* Explicit Cookie Consent Option */}
+                            {}
                             {!hasConsented && (
                                 <div className="bg-slate-50 rounded-2xl p-6 border-2 border-slate-100 relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-2xl rounded-full -mr-12 -mt-12"></div>
@@ -244,7 +242,6 @@ const Home = () => {
                     © 2026 Audit Readiness. Professional Grade Compliance Tools. | Powered by Comply Strong
                 </footer>
             </div>
-
 
         </div>
     );

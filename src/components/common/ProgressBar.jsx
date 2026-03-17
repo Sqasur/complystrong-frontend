@@ -1,13 +1,5 @@
 import React from 'react';
 
-/**
- * Reusable progress bar component.
- * @param {Object} props
- * @param {number} props.progress - Percentage of progress (0-100).
- * @param {string} props.label - Optional label to display above the bar.
- * @param {string} props.subLabel - Optional sub-label to display below the bar.
- * @param {string} props.color - Tailwind color class for the bar (default: bg-blue-600).
- */
 const ProgressBar = ({ progress, label, color = 'bg-emerald-500' }) => {
     return (
         <div className="w-full">

@@ -52,7 +52,6 @@ const Wizard = () => {
             },
         }));
 
-        // Auto-advance to next question or submit if last
         if (currentIndex < questions.length - 1) {
             setTimeout(() => setCurrentIndex(currentIndex + 1), 300);
         }
@@ -66,7 +65,7 @@ const Wizard = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            // Save lead data to localStorage for auto-fill in booking
+            
             localStorage.setItem('leadData', JSON.stringify(leadData));
 
             const result = await apiService.submitAssessment(certId, Object.values(answers), leadData);
@@ -94,7 +93,7 @@ const Wizard = () => {
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
-            {/* Header */}
+            {}
             <nav className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-20 relative">
                 <div className="flex items-center gap-4 sm:gap-6 relative z-10 w-1/3">
                     <button
@@ -114,7 +113,7 @@ const Wizard = () => {
                 <div className="absolute left-1/2 transform -translate-x-1/2 text-center hidden sm:block w-1/3">
                     <h2 className="text-sm sm:text-base font-black text-black uppercase tracking-widest truncate">{certification?.name}</h2>
                 </div>
-                <div className="w-1/3 hidden sm:block"></div> {/* Right spacer to balance layout */}
+                <div className="w-1/3 hidden sm:block"></div> {}
             </nav>
 
             <div className="flex-1 overflow-y-auto pt-4 pb-4">
@@ -124,7 +123,7 @@ const Wizard = () => {
                             <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white text-[11px] sm:text-xs font-bold rounded-[24px] uppercase tracking-widest leading-none flex items-center shadow-md shadow-indigo-100/50">
                                 {questions[currentIndex]?.category || 'Documentation'}
                             </span>
-                            {/* Cookie Consent Indicator for Wizard */}
+                            {}
                             {!hasConsented && (
                                 <button
                                     onClick={() => {
@@ -155,7 +154,7 @@ const Wizard = () => {
                         onOptionSelect={handleOptionSelect}
                     />
 
-                    {/* Footer Navigation */}
+                    {}
                     <div className="mt-4 flex justify-between gap-4">
                         <button
                             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
@@ -185,12 +184,12 @@ const Wizard = () => {
                 </div>
             </div>
 
-            {/* Lead Capture Modal */}
+            {}
             {showLeadForm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !submitting && setShowLeadForm(false)}></div>
                     <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl p-8 sm:p-10 animate-fade-in-up border border-slate-100">
-                        {/* Close button */}
+                        {}
                         {!submitting && (
                             <button
                                 onClick={() => setShowLeadForm(false)}

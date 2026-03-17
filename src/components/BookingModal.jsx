@@ -43,10 +43,10 @@ const BookingModal = ({ isOpen, onClose }) => {
                 const data = await res.json();
                 throw new Error(data.error || 'Failed to confirm booking.');
             }
-            setStep(3); // Success step
+            setStep(3); 
         } catch (err) {
             const msg = err.message || 'Something went wrong. Please try again.';
-            // Simplify the technical error message for users
+            
             if (msg.includes('buffering timed out') || msg.includes('unavailable') || msg.includes('ECONNREFUSED')) {
                 setError('Connection issue. Please wait a moment and try again.');
             } else {
@@ -67,7 +67,7 @@ const BookingModal = ({ isOpen, onClose }) => {
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
             <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                {/* Header */}
+                {}
                 <div className="bg-indigo-600 p-6 flex items-center justify-between text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
                     <div>
